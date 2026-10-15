@@ -1,0 +1,484 @@
+{
+  "info": {
+    "_postman_id": "hackathon-randomizer-api-v1",
+    "name": "Hackathon Team Randomizer API",
+    "description": "Comprehensive REST API collection for the Hackathon Team Randomizer Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('authToken', jsonData.data.token);",
+                  "    console.log('authToken set successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@hackathon.edu\",\n  \"password\": \"AdminSecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"AdminSecurePassword123!\",\n  \"newPassword\": \"NewAdminSecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Get Students (Paginated & Filtered)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students?page=1&limit=20&academicYear=FIRST_YEAR&status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "academicYear", "value": "FIRST_YEAR" },
+                { "key": "status", "value": "ACTIVE" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Kavya Nair\",\n  \"studentId\": \"FY-CS-201\",\n  \"email\": \"kavya.nair@college.edu\",\n  \"academicYear\": \"FIRST_YEAR\",\n  \"department\": \"Computer Science\",\n  \"skills\": [\"Python\", \"Web Basics\"],\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Import Students (JSON)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"students\": [\n    {\n      \"fullName\": \"Rahul Verma\",\n      \"studentId\": \"FY-CS-202\",\n      \"academicYear\": \"FIRST_YEAR\",\n      \"department\": \"Computer Science\",\n      \"skills\": [\"React\", \"CSS\"]\n    },\n    {\n      \"fullName\": \"Sneha Patil\",\n      \"studentId\": \"SY-IT-105\",\n      \"academicYear\": \"SECOND_YEAR\",\n      \"department\": \"Information Technology\",\n      \"skills\": [\"Java\", \"Docker\"]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"department\": \"Artificial Intelligence\",\n  \"skills\": [\"PyTorch\", \"FastAPI\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student (Safe Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mentors",
+      "item": [
+        {
+          "name": "Get Mentors",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mentors?page=1&limit=20&status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "status", "value": "ACTIVE" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Mentor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Dr. Vikramaditya Sen\",\n  \"mentorId\": \"MTR-101\",\n  \"email\": \"v.sen@college.edu\",\n  \"expertise\": [\"System Design\", \"Cloud Architecture\", \"Kubernetes\"],\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mentors",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Import Mentors (JSON)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mentors\": [\n    {\n      \"fullName\": \"Prof. Shalini Roy\",\n      \"mentorId\": \"MTR-102\",\n      \"expertise\": [\"Machine Learning\", \"Computer Vision\"]\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mentors/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Get Mentor By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mentors/{{mentorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors", "{{mentorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Mentor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expertise\": [\"Distributed Systems\", \"Cloud Security\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mentors/{{mentorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors", "{{mentorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Mentor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mentors/{{mentorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["mentors", "{{mentorId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Team Generations",
+      "item": [
+        {
+          "name": "Preview Generation (No DB Save)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"balancedMentorDistribution\": true,\n  \"excludeAssignedStudents\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/generations/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations", "preview"]
+            }
+          }
+        },
+        {
+          "name": "Create Generation (Finalize & Save)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"generationName\": \"HackNation 2026 Cohort Alpha\",\n  \"balancedMentorDistribution\": true,\n  \"excludeAssignedStudents\": false,\n  \"teamNamePrefix\": \"Team Alpha\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/generations",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations"]
+            }
+          }
+        },
+        {
+          "name": "List Generations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/generations?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Generation By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/generations/{{generationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations", "{{generationId}}"]
+            }
+          }
+        },
+        {
+          "name": "Edit Team Composition in Generation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstYearStudentIds\": [\"6ad10b...fy1\", \"6ad10b...fy2\"],\n  \"secondYearStudentId\": \"6ad10b...sy1\",\n  \"mentorId\": \"6ad10b...mentor\",\n  \"teamName\": \"Team Phoenix\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/generations/{{generationId}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations", "{{generationId}}", "teams", "{{teamId}}"]
+            }
+          }
+        },
+        {
+          "name": "Regenerate Teams (Preserves History)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirm\": true,\n  \"generationName\": \"HackNation 2026 Cohort Alpha (Re-randomized)\",\n  \"balancedMentorDistribution\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/generations/{{generationId}}/regenerate",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations", "{{generationId}}", "regenerate"]
+            }
+          }
+        },
+        {
+          "name": "Export Generation to CSV",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/generations/{{generationId}}/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["generations", "{{generationId}}", "export"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
